@@ -8,7 +8,7 @@ pub struct Camera {
     zoom: f32,
     last_mouse_position: Vec2,
     last_touch_position: Vec2,
-    last_pinch_distance: f32,
+    last_pinch_distance: Option<f32>,
     panning: bool,
     zooming: bool,
 }
@@ -33,7 +33,7 @@ impl Camera {
         zoom: f32,
         last_mouse_position: Vec2,
         last_touch_position: Vec2,
-        last_pinch_distance: f32,
+        last_pinch_distance: Option<f32>,
     ) -> Self {
         Self {
             camera,
@@ -73,10 +73,12 @@ impl Camera {
 
             let pinch_distance = touch_1.position.distance(touch_2.position);
 
-            let scale = pinch_distance / self.last_pinch_distance;
-            self.zoom *= scale;
+            if let Some(last_pinch_distance) = self.last_pinch_distance {
+                let scale = pinch_distance / last_pinch_distance;
+                self.zoom *= scale;
+            }
 
-            self.last_pinch_distance = pinch_distance;
+            self.last_pinch_distance = Some(pinch_distance);
         }
 
         let (screen_width, screen_height) = (screen_width(), screen_height());
