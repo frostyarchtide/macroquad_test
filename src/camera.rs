@@ -51,8 +51,9 @@ impl Camera {
 
     pub fn update(&mut self) {
         let mouse_position = Vec2::from(mouse_position());
+        let touches = touches();
 
-        if is_mouse_button_down(MouseButton::Left) {
+        if touches.len() == 0 && is_mouse_button_down(MouseButton::Left) {
             let delta = mouse_position - self.last_mouse_position;
             self.camera.target -= delta * MOUSE_SENSITIVITY / self.zoom;
         }
@@ -64,8 +65,6 @@ impl Camera {
         }
 
         self.last_mouse_position = mouse_position;
-
-        let touches = touches();
 
         if touches.len() == 2 {
             let touch_1 = &touches[0];
