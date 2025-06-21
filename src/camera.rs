@@ -73,6 +73,10 @@ impl Camera {
                 let delta = touch.position - last_touch_position;
                 self.camera.target -= delta / self.zoom;
             }
+
+            self.last_touch_position = Some(touch.position);
+        } else {
+            self.last_touch_position = None;
         }
 
         if touches.len() == 2 {
