@@ -1,35 +1,8 @@
-use std::f32::consts::TAU;
+mod camera;
+mod planet;
 
-use macroquad::{prelude::*, time};
-
-struct Planet {
-    pub radius: f32,
-    pub color: Color,
-    pub orbital_radius: f32,
-    pub orbital_period: f32,
-}
-
-impl Default for Planet {
-    fn default() -> Self {
-        Self {
-            radius: 1.,
-            color: WHITE,
-            orbital_radius: 0.,
-            orbital_period: 1.,
-        }
-    }
-}
-
-impl Planet {
-    fn new(radius: f32, color: Color, orbital_radius: f32, orbital_period: Option<f32>) -> Self {
-        Self {
-            radius,
-            color,
-            orbital_period: orbital_period.unwrap_or(orbital_radius * orbital_radius),
-            orbital_radius,
-        }
-    }
-}
+use crate::{camera::Camera, planet::*};
+use macroquad::prelude::*;
 
 #[macroquad::main("macroquad_test")]
 async fn main() {
@@ -39,56 +12,17 @@ async fn main() {
         Planet::new(1., GREEN, 10., None),
     ];
 
-    let mut zoom = 0.1;
-    let mut last_mouse_y: Option<f32> = None;
-    let mut last_pinch_distance: Option<f32> = None;
+    let mut camera = Camera::default();
 
     loop {
         clear_background(BLACK);
 
-        let aspect_ratio = screen_width() / screen_height();
-        let mut camera =
-            Camera2D::from_display_rect(Rect::new(-aspect_ratio, -1., aspect_ratio * 2., 2.));
+        camera.update();
 
-        if is_mouse_button_down(MouseButton::Right) {
-            let mouse_y = mouse_position().1;
-
-            if let Some(last_mouse_y) = last_mouse_y {
-                let delta_y = mouse_y - last_mouse_y;
-                let scale = 1.0 - delta_y * 0.005;
-                zoom *= scale;
-            }
-
-            last_mouse_y = Some(mouse_y);
-        } else {
-            last_mouse_y = None;
-        }
-
-        let touches = touches();
-        if touches.len() == 2 {
-            let touch_1 = &touches[0];
-            let touch_2 = &touches[1];
-
-            let pinch_distance = touch_1.position.distance(touch_2.position);
-
-            if let Some(last_pinch_distance) = last_pinch_distance {
-                let scale = pinch_distance / last_pinch_distance;
-                zoom *= scale;
-            }
-
-            last_pinch_distance = Some(pinch_distance);
-        } else {
-            last_pinch_distance = None;
-        }
-
-        camera.zoom = vec2(zoom / aspect_ratio, zoom);
-
-        set_camera(&camera);
+        set_camera(camera.get_camera());
 
         for planet in planets.iter() {
-            let angle = -(time::get_time() as f32 / planet.orbital_period).fract() * TAU;
-            let position = vec2(angle.cos(), angle.sin()) * planet.orbital_radius;
-            draw_poly(position.x, position.y, 64, planet.radius, 0., planet.color);
+            planet.draw();
         }
 
         set_default_camera();
