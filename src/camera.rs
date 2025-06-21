@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
-const MOUSE_SENSITIVITY: f32 = 0.002;
-const SCROLL_SENSITIVITY: f32 = 0.005;
+const PAN_SENSITIVITY: f32 = 0.002;
+const ZOOM_SENSITIVITY: f32 = 0.005;
 
 pub struct Camera {
     camera: Camera2D,
@@ -55,12 +55,12 @@ impl Camera {
 
         if touches.len() == 0 && is_mouse_button_down(MouseButton::Left) {
             let delta = mouse_position - self.last_mouse_position;
-            self.camera.target -= delta * MOUSE_SENSITIVITY / self.zoom;
+            self.camera.target -= delta * PAN_SENSITIVITY / self.zoom;
         }
 
         if touches.len() == 0 && is_mouse_button_down(MouseButton::Right) {
             let delta_y = mouse_position.y - self.last_mouse_position.y;
-            let scale = 1.0 - delta_y * SCROLL_SENSITIVITY;
+            let scale = 1.0 - delta_y * ZOOM_SENSITIVITY;
             self.zoom *= scale;
         }
 
@@ -71,7 +71,7 @@ impl Camera {
 
             if let Some(last_touch_position) = self.last_touch_position {
                 let delta = touch.position - last_touch_position;
-                self.camera.target -= delta / self.zoom;
+                self.camera.target -= delta * PAN_SENSITIVITY / self.zoom;
             }
 
             self.last_touch_position = Some(touch.position);
