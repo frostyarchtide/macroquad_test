@@ -7,7 +7,7 @@ pub struct Camera {
     camera: Camera2D,
     zoom: f32,
     last_mouse_position: Vec2,
-    last_touch_position: Vec2,
+    last_touch_position: Option<Vec2>,
     last_pinch_distance: Option<f32>,
     panning: bool,
     zooming: bool,
@@ -32,7 +32,7 @@ impl Camera {
         camera: Camera2D,
         zoom: f32,
         last_mouse_position: Vec2,
-        last_touch_position: Vec2,
+        last_touch_position: Option<Vec2>,
         last_pinch_distance: Option<f32>,
     ) -> Self {
         Self {
@@ -58,13 +58,22 @@ impl Camera {
             self.camera.target -= delta * MOUSE_SENSITIVITY / self.zoom;
         }
 
-        if is_mouse_button_down(MouseButton::Right) {
+        if touches.len() == 0 && is_mouse_button_down(MouseButton::Right) {
             let delta_y = mouse_position.y - self.last_mouse_position.y;
             let scale = 1.0 - delta_y * SCROLL_SENSITIVITY;
             self.zoom *= scale;
         }
 
         self.last_mouse_position = mouse_position;
+
+        if touches.len() == 1 {
+            let touch = &touches[0];
+
+            if let Some(last_touch_position) = self.last_touch_position {
+                let delta = touch.position - last_touch_position;
+                self.camera.target -= delta / self.zoom;
+            }
+        }
 
         if touches.len() == 2 {
             let touch_1 = &touches[0];
@@ -78,6 +87,8 @@ impl Camera {
             }
 
             self.last_pinch_distance = Some(pinch_distance);
+        } else {
+            self.last_pinch_distance = None;
         }
 
         let (screen_width, screen_height) = (screen_width(), screen_height());
