@@ -40,6 +40,7 @@ async fn main() {
     ];
 
     let mut zoom = 0.1;
+    let mut last_mouse_y: Option<f32> = None;
     let mut last_pinch_distance: Option<f32> = None;
 
     loop {
@@ -49,8 +50,19 @@ async fn main() {
         let mut camera =
             Camera2D::from_display_rect(Rect::new(-aspect_ratio, -1., aspect_ratio * 2., 2.));
 
-        let scroll = mouse_wheel().1;
-        zoom *= (1.0 - -scroll * 0.1).clamp(0.5, 2.);
+        if is_mouse_button_down(MouseButton::Right) {
+            let mouse_y = mouse_position().1;
+
+            if let Some(last_mouse_y) = last_mouse_y {
+                let delta_y = mouse_y - last_mouse_y;
+                let scale = 1.0 - delta_y * 0.005;
+                zoom *= scale;
+            }
+
+            last_mouse_y = Some(mouse_y);
+        } else {
+            last_mouse_y = None;
+        }
 
         let touches = touches();
         if touches.len() == 2 {
