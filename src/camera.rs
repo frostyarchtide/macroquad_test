@@ -75,7 +75,7 @@ impl Camera {
 
             if let Some(last_pinch_distance) = self.last_pinch_distance {
                 let scale = pinch_distance / last_pinch_distance;
-                self.zoom *= scale;
+                self.zoom *= scale * SCROLL_SENSITIVITY;
             }
 
             self.last_pinch_distance = Some(pinch_distance);
