@@ -50,7 +50,7 @@ async fn main() {
             Camera2D::from_display_rect(Rect::new(-aspect_ratio, -1., aspect_ratio * 2., 2.));
 
         let scroll = mouse_wheel().1;
-        zoom *= 1.0 - -scroll * 0.1;
+        zoom *= (1.0 - -scroll * 0.1).clamp(0.5, 2.);
 
         let touches = touches();
         if touches.len() == 2 {
@@ -65,6 +65,8 @@ async fn main() {
             }
 
             last_pinch_distance = Some(pinch_distance);
+        } else {
+            last_pinch_distance = None;
         }
 
         camera.zoom = vec2(zoom / aspect_ratio, zoom);
