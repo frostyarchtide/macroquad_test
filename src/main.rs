@@ -39,14 +39,35 @@ async fn main() {
         Planet::new(1., GREEN, 10., None),
     ];
 
+    let mut zoom = 0.1;
+    let mut last_pinch_distance: Option<f32> = None;
+
     loop {
         clear_background(BLACK);
 
-        let aspect_ratio = screen_width() as f32 / screen_height() as f32;
+        let aspect_ratio = screen_width() / screen_height();
         let mut camera =
             Camera2D::from_display_rect(Rect::new(-aspect_ratio, -1., aspect_ratio * 2., 2.));
 
-        camera.zoom = vec2(0.1 / aspect_ratio, 0.1);
+        let scroll = mouse_wheel().1;
+        zoom *= 1.0 - -scroll * 0.1;
+
+        let touches = touches();
+        if touches.len() == 2 {
+            let touch_1 = &touches[0];
+            let touch_2 = &touches[1];
+
+            let pinch_distance = touch_1.position.distance(touch_2.position);
+
+            if let Some(last_pinch_distance) = last_pinch_distance {
+                let scale = pinch_distance / last_pinch_distance;
+                zoom *= scale;
+            }
+
+            last_pinch_distance = Some(pinch_distance);
+        }
+
+        camera.zoom = vec2(zoom / aspect_ratio, zoom);
 
         set_camera(&camera);
 
