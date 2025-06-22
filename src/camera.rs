@@ -28,23 +28,6 @@ impl Default for Camera {
 }
 
 impl Camera {
-    pub fn new(
-        camera: Camera2D,
-        zoom: f32,
-        last_mouse_position: Vec2,
-        last_touch_position: Option<Vec2>,
-        last_pinch_distance: Option<f32>,
-    ) -> Self {
-        Self {
-            camera,
-            zoom,
-            last_mouse_position,
-            last_touch_position,
-            last_pinch_distance,
-            ..Default::default()
-        }
-    }
-
     pub fn get_camera(&self) -> &Camera2D {
         return &self.camera;
     }

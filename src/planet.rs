@@ -34,9 +34,15 @@ impl Planet {
         }
     }
 
-    pub fn draw(&self) {
+    pub fn get_position(&self) -> Vec2 {
         let angle = -(time::get_time() as f32 / self.orbital_period).fract() * TAU;
         let position = vec2(angle.cos(), angle.sin()) * self.orbital_radius;
+        
+        return position;
+    }
+
+    pub fn draw(&self) {
+        let position = self.get_position();
         draw_poly(position.x, position.y, 64, self.radius, 0., self.color);
     }
 }
