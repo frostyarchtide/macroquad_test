@@ -1,6 +1,8 @@
 use macroquad::prelude::*;
+use std::ops::RangeInclusive;
 
 const ZOOM_SENSITIVITY: f32 = 0.005;
+const ZOOM_RANGE: RangeInclusive<f32> = 0.05..=2.;
 
 pub struct Camera {
     pub camera: Camera2D,
@@ -44,7 +46,7 @@ impl Camera {
             if let Some(mouse_zoom_y) = self.mouse_zoom_y {
                 let delta_y = mouse_position.y - mouse_zoom_y;
                 let scale = 1.0 - delta_y * ZOOM_SENSITIVITY;
-                self.zoom *= scale;
+                self.zoom = (self.zoom * scale).clamp(*ZOOM_RANGE.start(), *ZOOM_RANGE.end());
             }
 
             self.mouse_zoom_y = Some(mouse_position.y);
@@ -72,7 +74,7 @@ impl Camera {
 
             if let Some(pinch_distance) = self.pinch_distance {
                 let scale = distance / pinch_distance;
-                self.zoom *= scale;
+                self.zoom = (self.zoom * scale).clamp(*ZOOM_RANGE.start(), *ZOOM_RANGE.end());
             }
 
             self.pinch_distance = Some(distance);
