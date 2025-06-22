@@ -42,13 +42,17 @@ async fn main() {
 
         set_camera(camera.get_camera());
 
-        for planet in planets.iter() {
-            if is_mouse_button_pressed(MouseButton::Left) {
+        if is_mouse_button_pressed(MouseButton::Left) {
+            selected = None;
+
+            for planet in planets.iter() {
                 let mouse_position = camera.get_camera().screen_to_world(Vec2::from(mouse_position()));
                 let delta = mouse_position - planet.get_position();
                 if delta.length() < planet.radius { selected = Some(planet) }
             }
+        }
 
+        for planet in planets.iter() {
             planet.draw();
         }
 
