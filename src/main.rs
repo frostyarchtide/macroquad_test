@@ -40,13 +40,13 @@ async fn main() {
 
         camera.update();
 
-        set_camera(camera.get_camera());
+        set_camera(&camera.camera);
 
         if is_mouse_button_pressed(MouseButton::Left) {
             selected = None;
 
             for planet in planets.iter() {
-                let mouse_position = camera.get_camera().screen_to_world(Vec2::from(mouse_position()));
+                let mouse_position = camera.camera.screen_to_world(Vec2::from(mouse_position()));
                 let delta = mouse_position - planet.get_position();
                 if delta.length() < planet.radius { selected = Some(planet) }
             }
@@ -60,8 +60,8 @@ async fn main() {
 
         if let Some(planet) = selected {
             let planet_position = planet.get_position();
-            let position = camera.get_camera().world_to_screen(planet_position);
-            let edge_position = camera.get_camera().world_to_screen(planet_position + Vec2::new(planet.radius, 0.));
+            let position = camera.camera.world_to_screen(planet_position);
+            let edge_position = camera.camera.world_to_screen(planet_position + Vec2::new(planet.radius, 0.));
             let radius = (edge_position.x - position.x + CROSSHAIR_RADIUS_PADDING).max(MINIMUM_CROSSHAIR_RADIUS);
             draw_crosshair(position.x, position.y, radius, CROSSHAIR_GAP_PERCENT, CROSSHAIR_THICKNESS, CROSSHAIR_COLOR);
         }

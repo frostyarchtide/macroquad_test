@@ -3,13 +3,12 @@ use macroquad::prelude::*;
 const ZOOM_SENSITIVITY: f32 = 0.005;
 
 pub struct Camera {
-    camera: Camera2D,
+    pub camera: Camera2D,
     zoom: f32,
-    last_mouse_position: Vec2,
-    last_touch_position: Option<Vec2>,
-    last_pinch_distance: Option<f32>,
-    panning: bool,
-    zooming: bool,
+    mouse_pan_position: Option<Vec2>,
+    mouse_zoom_y: Option<f32>,
+    touch_pan_position: Option<Vec2>,
+    pinch_distance: Option<f32>,
 }
 
 impl Default for Camera {
@@ -17,64 +16,68 @@ impl Default for Camera {
         Self {
             camera: Default::default(),
             zoom: 0.1,
-            last_mouse_position: Default::default(),
-            last_touch_position: Default::default(),
-            last_pinch_distance: Default::default(),
-            panning: false,
-            zooming: false,
+            mouse_pan_position: Default::default(),
+            mouse_zoom_y: Default::default(),
+            touch_pan_position: Default::default(),
+            pinch_distance: Default::default(),
         }
     }
 }
 
 impl Camera {
-    pub fn get_camera(&self) -> &Camera2D {
-        return &self.camera;
-    }
-
     pub fn update(&mut self) {
         let mouse_position = Vec2::from(mouse_position());
         let touches = touches();
 
-        if touches.len() == 0 && is_mouse_button_down(MouseButton::Left) {
-            let delta = self.camera.screen_to_world(mouse_position) - self.camera.screen_to_world(self.last_mouse_position);
-            self.camera.target -= delta;
+        if touches.len() == 0 && self.mouse_zoom_y.is_none() && is_mouse_button_down(MouseButton::Left) {
+            if let Some(mouse_pan_position) = self.mouse_pan_position {
+                let delta = self.camera.screen_to_world(mouse_position) - self.camera.screen_to_world(mouse_pan_position);
+                self.camera.target -= delta;
+            }
+
+            self.mouse_pan_position = Some(mouse_position);
+        } else {
+            self.mouse_pan_position = None;
         }
 
-        if touches.len() == 0 && is_mouse_button_down(MouseButton::Right) {
-            let delta_y = mouse_position.y - self.last_mouse_position.y;
-            let scale = 1.0 - delta_y * ZOOM_SENSITIVITY;
-            self.zoom *= scale;
-        }
+        if touches.len() == 0 && self.mouse_pan_position.is_none() && is_mouse_button_down(MouseButton::Right) {
+            if let Some(mouse_zoom_y) = self.mouse_zoom_y {
+                let delta_y = mouse_position.y - mouse_zoom_y;
+                let scale = 1.0 - delta_y * ZOOM_SENSITIVITY;
+                self.zoom *= scale;
+            }
 
-        self.last_mouse_position = mouse_position;
+            self.mouse_zoom_y = Some(mouse_position.y);
+        } else {
+            self.mouse_zoom_y = None;
+        }
 
         if touches.len() == 1 {
             let touch = &touches[0];
 
-            if let Some(last_touch_position) = self.last_touch_position {
-                let delta = self.camera.screen_to_world(touch.position) - self.camera.screen_to_world(last_touch_position);
+            if let Some(touch_pan_position) = self.touch_pan_position {
+                let delta = self.camera.screen_to_world(touch.position) - self.camera.screen_to_world(touch_pan_position);
                 self.camera.target -= delta;
             }
 
-            self.last_touch_position = Some(touch.position);
+            self.touch_pan_position = Some(touch.position);
         } else {
-            self.last_touch_position = None;
+            self.touch_pan_position = None;
         }
 
         if touches.len() == 2 {
             let touch_1 = &touches[0];
             let touch_2 = &touches[1];
+            let distance = touch_1.position.distance(touch_2.position);
 
-            let pinch_distance = touch_1.position.distance(touch_2.position);
-
-            if let Some(last_pinch_distance) = self.last_pinch_distance {
-                let scale = pinch_distance / last_pinch_distance;
+            if let Some(pinch_distance) = self.pinch_distance {
+                let scale = distance / pinch_distance;
                 self.zoom *= scale;
             }
 
-            self.last_pinch_distance = Some(pinch_distance);
+            self.pinch_distance = Some(distance);
         } else {
-            self.last_pinch_distance = None;
+            self.pinch_distance = None;
         }
 
         let (screen_width, screen_height) = (screen_width(), screen_height());
