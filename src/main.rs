@@ -6,7 +6,7 @@ use macroquad::prelude::*;
 
 const MINIMUM_CROSSHAIR_RADIUS: f32 = 25.;
 const CROSSHAIR_RADIUS_PADDING: f32 = 5.;
-const CROSSHAIR_GAP_PERCENT: f32 = 0.2;
+const CROSSHAIR_GAP_PERCENT: f32 = 0.5;
 const CROSSHAIR_THICKNESS: f32 = 3.;
 const CROSSHAIR_COLOR: Color = WHITE;
 

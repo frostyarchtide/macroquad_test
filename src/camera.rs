@@ -1,6 +1,5 @@
 use macroquad::prelude::*;
 
-const PAN_SENSITIVITY: f32 = 0.002;
 const ZOOM_SENSITIVITY: f32 = 0.005;
 
 pub struct Camera {
@@ -37,8 +36,8 @@ impl Camera {
         let touches = touches();
 
         if touches.len() == 0 && is_mouse_button_down(MouseButton::Left) {
-            let delta = mouse_position - self.last_mouse_position;
-            self.camera.target -= delta * PAN_SENSITIVITY / self.zoom;
+            let delta = self.camera.screen_to_world(mouse_position) - self.camera.screen_to_world(self.last_mouse_position);
+            self.camera.target -= delta;
         }
 
         if touches.len() == 0 && is_mouse_button_down(MouseButton::Right) {
@@ -53,8 +52,8 @@ impl Camera {
             let touch = &touches[0];
 
             if let Some(last_touch_position) = self.last_touch_position {
-                let delta = touch.position - last_touch_position;
-                self.camera.target -= delta * PAN_SENSITIVITY / self.zoom;
+                let delta = self.camera.screen_to_world(touch.position) - self.camera.screen_to_world(last_touch_position);
+                self.camera.target -= delta;
             }
 
             self.last_touch_position = Some(touch.position);
