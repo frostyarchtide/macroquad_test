@@ -31,9 +31,13 @@ impl Camera {
         let mouse_position = Vec2::from(mouse_position());
         let touches = touches();
 
-        if touches.len() == 0 && self.mouse_zoom_y.is_none() && is_mouse_button_down(MouseButton::Left) {
+        if touches.len() == 0
+            && self.mouse_zoom_y.is_none()
+            && is_mouse_button_down(MouseButton::Left)
+        {
             if let Some(mouse_pan_position) = self.mouse_pan_position {
-                let delta = self.camera.screen_to_world(mouse_position) - self.camera.screen_to_world(mouse_pan_position);
+                let delta = self.camera.screen_to_world(mouse_position)
+                    - self.camera.screen_to_world(mouse_pan_position);
                 self.camera.target -= delta;
             }
 
@@ -42,7 +46,10 @@ impl Camera {
             self.mouse_pan_position = None;
         }
 
-        if touches.len() == 0 && self.mouse_pan_position.is_none() && is_mouse_button_down(MouseButton::Right) {
+        if touches.len() == 0
+            && self.mouse_pan_position.is_none()
+            && is_mouse_button_down(MouseButton::Right)
+        {
             if let Some(mouse_zoom_y) = self.mouse_zoom_y {
                 let delta_y = mouse_position.y - mouse_zoom_y;
                 let scale = 1.0 - delta_y * ZOOM_SENSITIVITY;
@@ -58,7 +65,8 @@ impl Camera {
             let touch = &touches[0];
 
             if let Some(touch_pan_position) = self.touch_pan_position {
-                let delta = self.camera.screen_to_world(touch.position) - self.camera.screen_to_world(touch_pan_position);
+                let delta = self.camera.screen_to_world(touch.position)
+                    - self.camera.screen_to_world(touch_pan_position);
                 self.camera.target -= delta;
             }
 

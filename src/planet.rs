@@ -6,6 +6,7 @@ pub struct Planet {
     pub color: Color,
     pub orbital_radius: f32,
     pub orbital_period: f32,
+    pub position: Vec2,
 }
 
 impl Default for Planet {
@@ -15,6 +16,7 @@ impl Default for Planet {
             color: WHITE,
             orbital_radius: 0.,
             orbital_period: 1.,
+            position: Default::default(),
         }
     }
 }
@@ -31,18 +33,23 @@ impl Planet {
             color,
             orbital_period: orbital_period.unwrap_or(orbital_radius * orbital_radius),
             orbital_radius,
+            ..Default::default()
         }
     }
 
-    pub fn get_position(&self) -> Vec2 {
+    pub fn update(&mut self) {
         let angle = -(time::get_time() as f32 / self.orbital_period).fract() * TAU;
-        let position = vec2(angle.cos(), angle.sin()) * self.orbital_radius;
-        
-        return position;
+        self.position = vec2(angle.cos(), angle.sin()) * self.orbital_radius;
     }
 
     pub fn draw(&self) {
-        let position = self.get_position();
-        draw_poly(position.x, position.y, 64, self.radius, 0., self.color);
+        draw_poly(
+            self.position.x,
+            self.position.y,
+            64,
+            self.radius,
+            0.,
+            self.color,
+        );
     }
 }
