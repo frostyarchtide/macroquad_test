@@ -1,3 +1,4 @@
+use crate::{planet::Planet, target::Target};
 use macroquad::prelude::*;
 use std::ops::RangeInclusive;
 
@@ -27,11 +28,12 @@ impl Default for Camera {
 }
 
 impl Camera {
-    pub fn update(&mut self) {
+    pub fn update(&mut self, target: &Target, planets: &Vec<Planet>) {
         let mouse_position = Vec2::from(mouse_position());
         let touches = touches();
 
         if touches.len() == 0
+            && target.planet.is_none()
             && self.mouse_zoom_y.is_none()
             && is_mouse_button_down(MouseButton::Left)
         {
@@ -61,7 +63,7 @@ impl Camera {
             self.mouse_zoom_y = None;
         }
 
-        if touches.len() == 1 {
+        if touches.len() == 1 && target.planet.is_none() {
             let touch = &touches[0];
 
             if let Some(touch_pan_position) = self.touch_pan_position {
@@ -93,5 +95,10 @@ impl Camera {
         let (screen_width, screen_height) = (screen_width(), screen_height());
         let aspect_ratio = screen_width / screen_height;
         self.camera.zoom = vec2(self.zoom / aspect_ratio, self.zoom);
+
+        if let Some(i) = target.planet {
+            let planet = &planets[i];
+            self.camera.target = planet.position;
+        }
     }
 }

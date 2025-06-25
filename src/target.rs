@@ -9,14 +9,14 @@ const THICKNESS: f32 = 3.;
 const COLOR: Color = WHITE;
 
 pub struct Target {
-    planet: Option<usize>,
-    last_click: f64,
+    pub planet: Option<usize>,
+    pub last_click: f64,
 }
 
 impl Target {
     pub fn new() -> Self {
         Self {
-            planet: None,
+            planet: Default::default(),
             last_click: -DOUBLE_CLICK_TIME,
         }
     }
@@ -47,7 +47,11 @@ impl Target {
     pub fn draw(&self, camera: &Camera, planets: &Vec<Planet>) {
         if let Some(i) = self.planet {
             let planet = &planets[i];
-            let screen_radius = camera.camera.world_to_screen(planet.position + vec2(planet.radius, 0.)).x - camera.camera.world_to_screen(planet.position).x;
+            let screen_radius = camera
+                .camera
+                .world_to_screen(planet.position + vec2(planet.radius, 0.))
+                .x
+                - camera.camera.world_to_screen(planet.position).x;
             let radius = screen_radius.max(MINIMUM_RADIUS) + RADIUS_PADDING;
             let thick_radius = radius + THICKNESS / 2.;
             let gap_radius = radius * GAP_PERCENT;
