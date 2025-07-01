@@ -1,7 +1,22 @@
 use macroquad::{prelude::*, time};
 use std::f32::consts::TAU;
 
+pub struct Info {
+    pub website: String,
+    pub username: String,
+}
+
+impl Default for Info {
+    fn default() -> Self {
+        Self {
+            website: String::from("Example Website"),
+            username: String::from("example_username"),
+        }
+    }
+}
+
 pub struct Planet {
+    pub info: Info,
     pub radius: f32,
     pub color: Color,
     pub orbital_radius: f32,
@@ -12,6 +27,7 @@ pub struct Planet {
 impl Default for Planet {
     fn default() -> Self {
         Self {
+            info: Default::default(),
             radius: 1.,
             color: WHITE,
             orbital_radius: 0.,
@@ -23,12 +39,14 @@ impl Default for Planet {
 
 impl Planet {
     pub fn new(
+        info: Info,
         radius: f32,
         color: Color,
         orbital_radius: f32,
         orbital_period: Option<f32>,
     ) -> Self {
         Self {
+            info,
             radius,
             color,
             orbital_period: orbital_period.unwrap_or(orbital_radius * orbital_radius),
