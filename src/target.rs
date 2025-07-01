@@ -22,7 +22,9 @@ impl Target {
     }
 
     pub fn update(&mut self, camera: &Camera, planets: &Vec<Planet>) {
-        if is_mouse_button_pressed(MouseButton::Left) {
+        let touches = touches();
+
+        if is_mouse_button_pressed(MouseButton::Left) && touches.len() < 2 {
             let time = get_time();
 
             if time - self.last_click < DOUBLE_CLICK_TIME {

@@ -19,14 +19,14 @@ async fn main() {
     loop {
         clear_background(BLACK);
 
-        set_camera(&camera.camera);
-
         for planet in planets.iter_mut() {
             planet.update();
         }
 
         target.update(&camera, &planets);
         camera.update(&target, &planets);
+
+        set_camera(&camera.camera);
 
         for planet in planets.iter() {
             planet.draw();
